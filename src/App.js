@@ -1,21 +1,38 @@
-import UserFinder from './components/UserFinder';
-import UsersContext from './store/users-context';
+import React, { useState } from 'react';
 
-const DUMMY_USERS = [
-  { id: 'u1', name: 'Max' },
-  { id: 'u2', name: 'Manuel' },
-  { id: 'u3', name: 'Julie' },
-];
+import MoviesList from './components/MoviesList';
+import './App.css';
 
 function App() {
-  const usersContext = {
-    users: DUMMY_USERS
+  const [movies, setMovies] = useState([]);
+
+  function fetchMoviesHandler() {
+    fetch('https://swapi.dev/api/films/')
+      .then((response) => {
+        return response.json();
+      })
+      .then((data) => {
+        const transformedMovies = data.results.map((movieData) => {
+          return {
+            id: movieData.episode_id,
+            title: movieData.title,
+            openingText: movieData.opening_crawl,
+            releaseDate: movieData.release_date,
+          };
+        });
+        setMovies(transformedMovies);
+      });
   }
 
   return (
-    <UsersContext.Provider value={usersContext}>
-      <UserFinder />
-    </UsersContext.Provider>
+    <React.Fragment>
+      <section>
+        <button onClick={fetchMoviesHandler}>Fetch Movies</button>
+      </section>
+      <section>
+        <MoviesList movies={movies} />
+      </section>
+    </React.Fragment>
   );
 }
 
